@@ -1,0 +1,14 @@
+<svg width="1200" height="720" viewBox="0 0 1200 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="720" rx="36" fill="#EFF6FF"/>
+  <rect x="64" y="56" width="1072" height="608" rx="30" fill="white" stroke="#BFDBFE" stroke-width="2"/>
+  <rect x="112" y="104" width="976" height="120" rx="24" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="2"/>
+  <text x="144" y="160" fill="#0F172A" font-family="Arial, sans-serif" font-size="30" font-weight="700">Step 3</text>
+  <text x="144" y="202" fill="#475569" font-family="Arial, sans-serif" font-size="24">Copy the confirmed transaction hash and submit it back into the matching draft.</text>
+  <rect x="112" y="276" width="976" height="248" rx="24" fill="#FFF7E3" stroke="#F2D27A" stroke-width="2"/>
+  <text x="152" y="332" fill="#0F172A" font-family="Arial, sans-serif" font-size="24" font-weight="700">Submit transaction hash</text>
+  <rect x="152" y="368" width="720" height="72" rx="16" fill="white" stroke="#94A3B8" stroke-width="2"/>
+  <text x="184" y="414" fill="#64748B" font-family="Arial, sans-serif" font-size="26">0x9f3c...b47a</text>
+  <rect x="904" y="368" width="144" height="72" rx="16" fill="#0F172A"/>
+  <text x="940" y="414" fill="white" font-family="Arial, sans-serif" font-size="24" font-weight="700">Submit</text>
+  <text x="112" y="588" fill="#475569" font-family="Arial, sans-serif" font-size="24">Verification matches the draft amount, treasury address, and ETH transfer.</text>
+</svg>

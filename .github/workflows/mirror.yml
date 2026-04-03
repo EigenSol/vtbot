@@ -1,0 +1,167 @@
+name: mirror
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "**"
+  delete:
+
+permissions:
+  contents: read
+
+jobs:
+  mirror:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/')
+    runs-on: ubuntu-latest
+    env:
+      REPO_B_SLUG: 'SRC-Assistant/vtbot'
+      EXCLUDES: '.github sync-a-to-b.sh setup.sh setup.ps1 update.sh update.ps1 toolkit-src.zip _notes'
+      DEFAULT_NAME: 'dilawarjahangir'
+      DEFAULT_EMAIL: 'dilawarjahangir2@gmail.com'
+      DEFAULT_SECRET_NAME: 'MIRROR_DILAWAR'
+      IDENTITY_MAP: |-
+        codekeyboard|pmchohan|abdullahchohan9919@gmail.com
+        pmchohan|pmchohan|abdullahchohan9919@gmail.com
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve mirror identity
+        env:
+          DEFAULT_SECRET_VALUE: ${{ secrets.MIRROR_DILAWAR }}
+          SECRET_MIRROR_DILAWAR: ${{ secrets.MIRROR_DILAWAR }}
+          SECRET_MIRROR_AF: ${{ secrets.MIRROR_AF }}
+          SECRET_MIRROR_AF_SAME: ${{ secrets.MIRROR_AF_SAME }}
+        run: |
+          set -euo pipefail
+
+          ACTOR="${GITHUB_ACTOR}"
+          SELECTED_NAME="${DEFAULT_NAME}"
+          SELECTED_EMAIL="${DEFAULT_EMAIL}"
+          SELECTED_SECRET_NAME="${DEFAULT_SECRET_NAME}"
+          SELECTED_TOKEN="${DEFAULT_SECRET_VALUE}"
+
+          case "${ACTOR}" in
+            codekeyboard)
+              SELECTED_NAME=pmchohan
+              SELECTED_EMAIL=abdullahchohan9919@gmail.com
+              SELECTED_SECRET_NAME=MIRROR_AF
+              SELECTED_TOKEN="${SECRET_MIRROR_AF}"
+              ;;
+            pmchohan)
+              SELECTED_NAME=pmchohan
+              SELECTED_EMAIL=abdullahchohan9919@gmail.com
+              SELECTED_SECRET_NAME=MIRROR_AF_SAME
+              SELECTED_TOKEN="${SECRET_MIRROR_AF_SAME}"
+              ;;
+            *)
+              ;;
+          esac
+
+          if [[ -z "${SELECTED_TOKEN}" ]]; then
+            echo "Mirror token is empty for actor '${ACTOR}' using secret '${SELECTED_SECRET_NAME}'." >&2
+            exit 1
+          fi
+
+          {
+            echo "MY_NAME=${SELECTED_NAME}"
+            echo "MY_EMAIL=${SELECTED_EMAIL}"
+            echo "MIRROR_SECRET_NAME=${SELECTED_SECRET_NAME}"
+            echo "MIRROR_TOKEN=${SELECTED_TOKEN}"
+            echo "TARGET_BRANCH=${GITHUB_REF_NAME}"
+          } >> "$GITHUB_ENV"
+
+      - name: Mirror A -> B
+        env:
+          REPO_B_URL: https://x-access-token:${{ env.MIRROR_TOKEN }}@github.com/${{ env.REPO_B_SLUG }}.git
+          MY_NAME: ${{ env.MY_NAME }}
+          MY_EMAIL: ${{ env.MY_EMAIL }}
+          DEFAULT_NAME: ${{ env.DEFAULT_NAME }}
+          DEFAULT_EMAIL: ${{ env.DEFAULT_EMAIL }}
+          IDENTITY_MAP: ${{ env.IDENTITY_MAP }}
+          TARGET_BRANCH: ${{ env.TARGET_BRANCH }}
+          EXCLUDES: ${{ env.EXCLUDES }}
+          BEFORE_SHA: ${{ github.event.before || '0000000000000000000000000000000000000000' }}
+          AFTER_SHA: ${{ github.sha }}
+        run: bash ./sync-a-to-b.sh
+
+  delete_branch:
+    if: github.event_name == 'delete' && github.event.ref_type == 'branch'
+    runs-on: ubuntu-latest
+    env:
+      REPO_B_SLUG: 'SRC-Assistant/vtbot'
+      EXCLUDES: '.github sync-a-to-b.sh setup.sh setup.ps1 update.sh update.ps1 toolkit-src.zip _notes'
+      DEFAULT_NAME: 'dilawarjahangir'
+      DEFAULT_EMAIL: 'dilawarjahangir2@gmail.com'
+      DEFAULT_SECRET_NAME: 'MIRROR_DILAWAR'
+      IDENTITY_MAP: |-
+        codekeyboard|pmchohan|abdullahchohan9919@gmail.com
+        pmchohan|pmchohan|abdullahchohan9919@gmail.com
+    steps:
+      - name: Resolve mirror identity
+        env:
+          DEFAULT_SECRET_VALUE: ${{ secrets.MIRROR_DILAWAR }}
+          SECRET_MIRROR_DILAWAR: ${{ secrets.MIRROR_DILAWAR }}
+          SECRET_MIRROR_AF: ${{ secrets.MIRROR_AF }}
+          SECRET_MIRROR_AF_SAME: ${{ secrets.MIRROR_AF_SAME }}
+          EVENT_REF: ${{ github.event.ref }}
+        run: |
+          set -euo pipefail
+
+          ACTOR="${GITHUB_ACTOR}"
+          SELECTED_NAME="${DEFAULT_NAME}"
+          SELECTED_EMAIL="${DEFAULT_EMAIL}"
+          SELECTED_SECRET_NAME="${DEFAULT_SECRET_NAME}"
+          SELECTED_TOKEN="${DEFAULT_SECRET_VALUE}"
+
+          case "${ACTOR}" in
+            codekeyboard)
+              SELECTED_NAME=pmchohan
+              SELECTED_EMAIL=abdullahchohan9919@gmail.com
+              SELECTED_SECRET_NAME=MIRROR_AF
+              SELECTED_TOKEN="${SECRET_MIRROR_AF}"
+              ;;
+            pmchohan)
+              SELECTED_NAME=pmchohan
+              SELECTED_EMAIL=abdullahchohan9919@gmail.com
+              SELECTED_SECRET_NAME=MIRROR_AF_SAME
+              SELECTED_TOKEN="${SECRET_MIRROR_AF_SAME}"
+              ;;
+            *)
+              ;;
+          esac
+
+          if [[ -z "${SELECTED_TOKEN}" ]]; then
+            echo "Mirror token is empty for actor '${ACTOR}' using secret '${SELECTED_SECRET_NAME}'." >&2
+            exit 1
+          fi
+
+          {
+            echo "MY_NAME=${SELECTED_NAME}"
+            echo "MY_EMAIL=${SELECTED_EMAIL}"
+            echo "MIRROR_SECRET_NAME=${SELECTED_SECRET_NAME}"
+            echo "MIRROR_TOKEN=${SELECTED_TOKEN}"
+            echo "TARGET_BRANCH=${EVENT_REF}"
+          } >> "$GITHUB_ENV"
+
+      - name: Delete branch in repo-b
+        env:
+          REPO_B_URL: https://x-access-token:${{ env.MIRROR_TOKEN }}@github.com/${{ env.REPO_B_SLUG }}.git
+          TARGET_BRANCH: ${{ env.TARGET_BRANCH }}
+        run: |
+          set -euo pipefail
+
+          WORK_DIR="$(mktemp -d)"
+          trap 'rm -rf "$WORK_DIR"' EXIT
+
+          git init -q "$WORK_DIR/repo-b"
+          cd "$WORK_DIR/repo-b"
+          git remote add origin "$REPO_B_URL"
+
+          if git ls-remote --exit-code --heads origin "$TARGET_BRANCH" >/dev/null 2>&1; then
+            git push origin --delete "$TARGET_BRANCH"
+          else
+            echo "Branch '$TARGET_BRANCH' does not exist in repo-b, skipping delete."
+          fi

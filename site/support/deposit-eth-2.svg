@@ -1,0 +1,16 @@
+<svg width="1200" height="720" viewBox="0 0 1200 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="720" rx="36" fill="#FFF7E3"/>
+  <rect x="88" y="60" width="1024" height="600" rx="30" fill="white" stroke="#D6D3D1" stroke-width="2"/>
+  <rect x="132" y="108" width="936" height="96" rx="24" fill="#0F172A"/>
+  <text x="168" y="166" fill="white" font-family="Arial, sans-serif" font-size="32" font-weight="700">MetaMask Send</text>
+  <rect x="132" y="244" width="936" height="330" rx="24" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="2"/>
+  <text x="172" y="304" fill="#0F172A" font-family="Arial, sans-serif" font-size="28" font-weight="700">Step 2</text>
+  <text x="172" y="346" fill="#475569" font-family="Arial, sans-serif" font-size="24">Send native ETH from the customer wallet to the treasury address.</text>
+  <rect x="172" y="394" width="392" height="120" rx="20" fill="white" stroke="#94A3B8" stroke-width="2"/>
+  <text x="204" y="438" fill="#475569" font-family="Arial, sans-serif" font-size="22">From</text>
+  <text x="204" y="476" fill="#0F172A" font-family="Arial, sans-serif" font-size="28" font-weight="700">Dilawar Wallet</text>
+  <rect x="628" y="394" width="392" height="120" rx="20" fill="white" stroke="#94A3B8" stroke-width="2"/>
+  <text x="660" y="438" fill="#475569" font-family="Arial, sans-serif" font-size="22">To</text>
+  <text x="660" y="476" fill="#0F172A" font-family="Arial, sans-serif" font-size="28" font-weight="700">Treasury Wallet</text>
+  <text x="172" y="616" fill="#7C2D12" font-family="Arial, sans-serif" font-size="24">No swap. No token transfer. ETH only for the deposit step.</text>
+</svg>

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VTB Frontend</title>
+  </head>
+  <body>
+    <script>
+      (function redirectGithubPagesFallback() {
+        var placeholderPrefix = '__VTB_';
+        var configuredBasePath = '/vtbot/';
+        var pathSegments = window.location.pathname.split('/').filter(Boolean);
+        var inferredBasePath = window.location.hostname.endsWith('.github.io') && pathSegments.length > 0
+          ? '/' + pathSegments[0] + '/'
+          : '/';
+        var normalizedConfiguredBasePath =
+          typeof configuredBasePath === 'string'
+          && configuredBasePath.trim()
+          && !configuredBasePath.startsWith(placeholderPrefix)
+            ? configuredBasePath.trim().replace(/^\/+|\/+$/g, '')
+            : '';
+        var basePath = normalizedConfiguredBasePath
+          ? '/' + normalizedConfiguredBasePath + '/'
+          : inferredBasePath;
+        var routePath = window.location.pathname;
+
+        if (basePath !== '/' && routePath.indexOf(basePath) === 0) {
+          routePath = routePath.slice(basePath.length - 1) || '/';
+        }
+
+        var redirectUrl = new URL(basePath, window.location.origin);
+        redirectUrl.searchParams.set(
+          '__vtb_route',
+          (routePath || '/') + window.location.search + window.location.hash,
+        );
+
+        window.location.replace(redirectUrl.toString());
+      })();
+    </script>
+  </body>
+</html>

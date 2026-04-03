@@ -1,0 +1,95 @@
+name: github-pages
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      should_publish: ${{ steps.repo-guard.outputs.should_publish }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check canonical repository
+        id: repo-guard
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "${GITHUB_REPOSITORY}" == "SRC-Assistant/vtbot" || "${GITHUB_REPOSITORY}" == "src-assistant/vtbot" ]]; then
+            echo "should_publish=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "should_publish=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Verify static Pages bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          test -f site/index.html
+          test -f site/404.html
+          test -f site/runtime-config.js
+
+          if rg -n 'VITE_APP_ENV:"development"' site; then
+            echo "vtbot site still contains development app env." >&2
+            exit 1
+          fi
+
+          if rg -n "https://src-assistant\\.github\\.io/vtb([/?\"']|$)" site; then
+            echo "vtbot site must not keep the old /vtb public URL." >&2
+            exit 1
+          fi
+
+          if rg -n 'vtb.eigensol.com' site/runtime-config.js; then
+            echo "vtbot runtime config must not expose the Linux frontend URL." >&2
+            exit 1
+          fi
+
+          if ! rg -n 'src-assistant.github.io/vtbot' site/runtime-config.js >/dev/null; then
+            echo "vtbot runtime config must target https://src-assistant.github.io/vtbot." >&2
+            exit 1
+          fi
+
+      - name: Upload Pages artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: github-pages-site
+          path: site
+
+  publish:
+    needs: build
+    if: needs.build.outputs.should_publish == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Pages artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: github-pages-site
+          path: .pages-artifact
+
+      - name: Publish to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: .pages-artifact
+          force_orphan: true
+
+  skip-note:
+    needs: build
+    if: needs.build.outputs.should_publish != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Skip publish outside canonical repo
+        run: |
+          echo "Skipping GitHub Pages publish because this workflow is not running in SRC-Assistant/vtbot."

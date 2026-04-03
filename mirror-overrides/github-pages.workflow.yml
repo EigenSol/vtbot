@@ -38,22 +38,22 @@ jobs:
           test -f site/404.html
           test -f site/runtime-config.js
 
-          if rg -n 'VITE_APP_ENV:"development"' site; then
+          if grep -RIn 'VITE_APP_ENV:"development"' site; then
             echo "vtbot site still contains development app env." >&2
             exit 1
           fi
 
-          if rg -n "https://src-assistant\\.github\\.io/vtb([/?\"']|$)" site; then
+          if grep -RInE "https://src-assistant\\.github\\.io/vtb([/?\"']|$)" site; then
             echo "vtbot site must not keep the old /vtb public URL." >&2
             exit 1
           fi
 
-          if rg -n 'vtb.eigensol.com' site/runtime-config.js; then
+          if grep -n 'vtb.eigensol.com' site/runtime-config.js; then
             echo "vtbot runtime config must not expose the Linux frontend URL." >&2
             exit 1
           fi
 
-          if ! rg -n 'src-assistant.github.io/vtbot' site/runtime-config.js >/dev/null; then
+          if ! grep -n 'src-assistant.github.io/vtbot' site/runtime-config.js >/dev/null; then
             echo "vtbot runtime config must target https://src-assistant.github.io/vtbot." >&2
             exit 1
           fi

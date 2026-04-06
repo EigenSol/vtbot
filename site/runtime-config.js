@@ -17,5 +17,6 @@
     publicAppUrl: readConfiguredValue('https://src-assistant.github.io/vtbot'),
     publicBasePath: readConfiguredValue('/vtbot/', '/'),
     apiBaseUrl: readConfiguredValue('https://vtb-api.eigensol.com'),
+    nativeAmountDisplayDecimals: readConfiguredValue('6'),
   });
 })();

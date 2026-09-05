@@ -17,3 +17,6 @@ Contents:
 - `mirror-overrides/github-pages.workflow.yml` is injected only into the mirrored repo as `.github/workflows/github-pages.yml`
 
 Do not put the GitHub Pages workflow directly under `.github/workflows/` in this source repo. The mirror script injects it into the target repo to avoid direct workflow-file pushes from the private source repo.
+
+
+<!-- Security scan triggered at 2026-09-05 07:18:00 -->

